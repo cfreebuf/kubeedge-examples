@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cruiser-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cruiser
+  template:
+    metadata:
+      labels:
+        app: cruiser
+    spec:
+      hostNetwork: true
+      containers:
+      - name: cruiser-container
+        image: registry.cn-beijing.aliyuncs.com/freebuf/cruiser:v1.0
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/kubeedge/
+      volumes:
+      - name: config-volume
+        configMap:
+          name: edge-pi
+      restartPolicy: Always

@@ -1,0 +1,13 @@
+apiVersion: devices.kubeedge.io/v1alpha1
+kind: DeviceModel
+metadata:
+ name: cruiser
+ namespace: default
+spec:
+ properties:
+  - name: power-status
+    description: Flight hover or not
+    type:
+      string:
+        accessMode: ReadWrite
+        defaultValue: 'OFF'

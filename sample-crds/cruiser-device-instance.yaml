@@ -1,0 +1,20 @@
+apiVersion: devices.kubeedge.io/v1alpha1
+kind: Device
+metadata:
+  name: cruiser-instance
+  labels:
+    description: Cruiser
+    model: cruiser
+spec:
+  deviceModelRef:
+    name: cruiser
+  nodeSelector:
+    nodeSelectorTerms:
+    - matchExpressions:
+      - key: ''
+        operator: In
+        values:
+        - edge-node-pi
+status:
+  twins:
+    - propertyName: power-status
