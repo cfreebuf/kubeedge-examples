@@ -12,12 +12,12 @@ import (
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/golang/glog"
-	"github.com/cfreebuf/kubeedge-examples/configuration"
-	"github.com/cfreebuf/kubeedge-examples/cruiserdriver"
+	"github.com/kubeedge-examples/kubeedge-examples/configuration"
+	"github.com/kubeedge-examples/kubeedge-examples/cruiserdriver"
 )
 
 const (
-	modelName                 = "Cruiser"
+	modelName                 = "CRUISER"
 	powerStatus               = "power-status"
 	pinNumberConfig           = "gpio-pin-number"
 	DeviceETPrefix            = "$hw/events/device/"
@@ -144,8 +144,14 @@ func LoadConfigMap() error {
 		return errors.New("Error while reading from config map " + err.Error())
 	}
 	for _, device := range readConfigMap.DeviceInstances {
+		// glog.Info("device model:", device.Model)
+		// glog.Info("model name:", modelName)
+		// glog.Info("device name:", device.Name)
+		// glog.Info("config device name:", configFile.DeviceName)
+		// glog.Info("device id:", device.ID)
 		if strings.ToUpper(device.Model) == modelName && strings.ToUpper(device.Name) == strings.ToUpper(configFile.DeviceName) {
 			deviceID = device.ID
+				// glog.Info("device id:", device.ID)
 		}
 	}
 	for _, deviceModel := range readConfigMap.DeviceModels {
@@ -172,6 +178,7 @@ func changeDeviceState(state string) {
 		glog.Error("Error:   ", err)
 	}
 	deviceStatusUpdate := DeviceETPrefix + deviceID + DeviceETStateUpdateSuffix
+	// glog.Info ("publish device state addr:", deviceStatusUpdate);
 	Token_client = Client.Publish(deviceStatusUpdate, 0, false, stateUpdateBody)
 	if Token_client.Wait() && Token_client.Error() != nil {
 		glog.Error("client.publish() Error in device state update  is ", Token_client.Error())
@@ -185,6 +192,7 @@ func changeTwinValue(updateMessage DeviceTwinUpdate) {
 		glog.Error("Error:   ", err)
 	}
 	deviceTwinUpdate := DeviceETPrefix + deviceID + TwinETUpdateSuffix
+	// glog.Info ("publish twin addr:", deviceTwinUpdate);
 	Token_client = Client.Publish(deviceTwinUpdate, 0, false, twinUpdateBody)
 	if Token_client.Wait() && Token_client.Error() != nil {
 		glog.Error("client.publish() Error in device twin update is ", Token_client.Error())
@@ -214,19 +222,20 @@ func getTwin(updateMessage DeviceTwinUpdate) {
 	if err != nil {
 		glog.Error("Error:   ", err)
 	}
+	// glog.Info ("publish twin state addr:", twinUpdateBody);
 	Token_client = Client.Publish(getTwin, 0, false, twinUpdateBody)
 	if Token_client.Wait() && Token_client.Error() != nil {
 		glog.Error("client.publish() Error in device twin get  is ", Token_client.Error())
 	}
 }
 
-//subscribe function subscribes  the device twin information through the MQTT broker
+//subscribe function subscribes the device twin information through the MQTT broker
 func subscribe() {
 	for {
 		getTwinResult := DeviceETPrefix + deviceID + TwinETGetResultSuffix
 		Token_client = Client.Subscribe(getTwinResult, 0, OnSubMessageReceived)
 		if Token_client.Wait() && Token_client.Error() != nil {
-			glog.Error("subscribe() Error in device twin result get  is ", Token_client.Error())
+			glog.Error("subscribe() Error in device twin result get is ", Token_client.Error())
 		}
 		time.Sleep(1 * time.Second)
 		if deviceTwinResult.Twin != nil {
@@ -243,8 +252,8 @@ func equateTwinValue(updateMessage DeviceTwinUpdate) {
 	go subscribe()
 	getTwin(updateMessage)
 	wg.Wait()
+	glog.Info("check twin value")
 	if deviceTwinResult.Twin[powerStatus].Actual == nil || *deviceTwinResult.Twin[powerStatus].Expected.Value != *deviceTwinResult.Twin[powerStatus].Actual.Value {
-		glog.Info("Expected Value : ", *deviceTwinResult.Twin[powerStatus].Expected.Value)
 		if deviceTwinResult.Twin[powerStatus].Actual == nil {
 			glog.Info("Actual Value: ", deviceTwinResult.Twin[powerStatus].Actual)
 		} else {
@@ -254,13 +263,11 @@ func equateTwinValue(updateMessage DeviceTwinUpdate) {
 		switch strings.ToUpper(*deviceTwinResult.Twin[powerStatus].Expected.Value) {
 		case "ON":
 			glog.Info("Flight Cruiser")
-			//Turn On the light by supplying power on the pin specified
 			// cruiserdriver.TurnON(pinNumber)
 			cruiserdriver.TurnON()
 
 		case "OFF":
 			glog.Info("Stop Cruiser")
-			//Turn Off the light by cutting off power on the pin specified
 			cruiserdriver.TurnOff()
 
 		default:

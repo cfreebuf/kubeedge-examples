@@ -14,7 +14,11 @@ spec:
       - key: ''
         operator: In
         values:
-        - edge-node-pi
+        - edge-pi
 status:
   twins:
     - propertyName: power-status
+      desired:
+        metadata:
+          type: string
+        value: 'ON'

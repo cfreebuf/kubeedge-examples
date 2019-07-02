@@ -1,12 +1,9 @@
-FROM ubuntu:latest
-
-RUN apt-get update && apt-get install -y python3 python3-pip
+#!/bin/bash
+FROM registry.cn-beijing.aliyuncs.com/freebuf/cruiseros:v0.1
 
 CMD mkdir -p cruiser
 
 COPY . cruiser/
-
-RUN cd /cruiser/cruiser-lib && pip3 install -r requirements.txt && cd -
 
 WORKDIR cruiser
 

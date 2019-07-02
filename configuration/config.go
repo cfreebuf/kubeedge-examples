@@ -10,8 +10,8 @@ import (
 var CONFIG_MAP_PATH = "/opt/kubeedge/deviceProfile.json"
 
 //CONFIG_FILE_PATH contains the location of the configuration file
-// var CONFIG_FILE_PATH = "configuration/config.yaml"
-var CONFIG_FILE_PATH = "conf/config.yaml"
+var CONFIG_FILE_PATH = "configuration/config.yaml"
+// var CONFIG_FILE_PATH = "conf/config.yaml"
 
 //ReadConfigFile is the structure that is used to read the config file to get configuration information from the user
 type ReadConfigFile struct {
